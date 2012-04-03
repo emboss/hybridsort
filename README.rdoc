@@ -1,0 +1,8 @@
+== hybrid-sort
+
+I analyzed whether CRuby's internal Quicksort could
+benefit from a hybrid approach where small sub problems
+would be sorted by insertion sort rather than by Quicksort
+all the way down. This is generally deemed beneficial 
+because Insertion Sort performs very well on short inputs.
+
