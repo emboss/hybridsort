@@ -170,7 +170,7 @@ typedef struct { char *LL, *RR; } stack_node; /* Stack structure for L,l,R,r */
 
 typedef int (cmpfunc_t)(const void*, const void*, void*);
 
-void
+static void
 insertion_sort(char *l, char *r, cmpfunc_t *cmp, void *d, mmargdecl)
 {
     char *p, *q, *v;
