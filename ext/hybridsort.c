@@ -372,6 +372,7 @@ sort_2(const void *ap, const void *bp, void *dummy)
 static VALUE
 hybrid_sort(VALUE self, VALUE ary, VALUE cutoff)
 {
+    ary = rb_ary_dup(ary);
     rqsort(RARRAY_PTR(ary), RARRAY_LEN(ary), sizeof(VALUE),
 		   rb_block_given_p()?sort_1:sort_2, NULL, (size_t)NUM2LONG(cutoff));
     return ary;
@@ -382,6 +383,6 @@ Init_hybridsort(void)
 {
     VALUE mHybrid = rb_define_module("Hybrid");
     id_cmp = rb_intern("<=>");
-    rb_define_module_function(mHybrid, "sort!", hybrid_sort, 2);
+    rb_define_module_function(mHybrid, "sort", hybrid_sort, 2);
 }
 

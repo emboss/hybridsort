@@ -7,11 +7,11 @@ prng = Random.new
 original = Array.new(1000) do |i|
   str = ""
   prng.rand(1..15).times { str << alphabet.sample(random: prng) }
-  str
+  str.to_sym
 end
 
 Benchmark.bm do |bm|
   for i in 1..25
-    bm.report("Threshhold: #{i}") { 10000.times { Hybrid.sort(original, i) } }
+    bm.report("Threshhold: #{i}") { 1000.times { Hybrid.sort(original, i) } }
   end
 end

@@ -1,17 +1,10 @@
 require 'hybridsort'
 require 'benchmark'
 
-original = Array.new(100000) { |i| i }
+original = Array.new(10000) { |i| i }.shuffle!
 
 Benchmark.bm do |bm|
-  for i in 1..27
-    prng = Random.new(112234)
-    ary = original.shuffle(random: prng)
-    bm.report("Threshhold: #{i}") do
-      500.times do
-        Hybrid.sort!(ary, i)
-        ary.shuffle!(random: prng)
-      end
-    end
+  for i in 1..25
+    bm.report("Threshhold: #{i}") { 1000.times { Hybrid.sort(original, i) } }
   end
 end
