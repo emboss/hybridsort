@@ -181,7 +181,8 @@ insertion_sort(char *l, char *r, cmpfunc_t *cmp, void *d, mmargdecl)
         for (q = p - size; q >= l && cmp(q, v, d) > 0; q -= size) {
 	    mmassign(q+size, q);
         }
-	mmassign(q+size, v);
+	if (q+size != p)
+	    mmassign(q+size, v);
     }
 }
 
@@ -202,7 +203,11 @@ rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d,
   goto start;
 
   nxt:
-  if (stack == top) return;    /* return if stack is empty */
+  if (stack == top) {
+      /* stack is empty - run insertion sort over to finalize */
+      insertion_sort(base, (char*)base + size*(nel-1), cmp, d, mmarg);
+      return;
+  }
   POP(L,R);
 
   for (;;) {
@@ -216,10 +221,8 @@ rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d,
     n = (r - l + size) / size;  /* number of elements */
     m = l + size * (n >> 1);    /* calculate median value */
 
-    if (n <= cutoff) {
-	insertion_sort(l, r, cmp, d, mmarg);
+    if (n <= cutoff) /* Leave chunks smaller than 'cutoff' unsorted */
 	goto nxt;
-    }
 
     if (n >= 60) {
       register char *m1;
