@@ -189,12 +189,13 @@ insertion_sort(char *l, char *r, cmpfunc_t *cmp, void *d, mmargdecl)
 void
 rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d, size_t cutoff)
 {
-  register char *l, *r, *m;          	/* l,r:left,right group   m:median point */
-  register int t, eq_l, eq_r;       	/* eq_l: all items in left group are equal to S */
-  char *L = base;                    	/* left end of current region */
-  char *R = (char*)base + size*(nel-1); /* right end of current region */
-  size_t chklim = 63;                   /* threshold of ordering element check */
-  stack_node stack[32], *top = stack;   /* 32 is enough for 32bit CPU */
+  register char *l, *r, *m;          	  /* l,r:left,right group   m:median point */
+  register int t, eq_l, eq_r;       	  /* eq_l: all items in left group are equal to S */
+  char *end = (char*)base + size*(nel-1); /* right end of current region */
+  char *L = base;                    	  /* left end of current region */
+  char *R = end; 			  /* right end of current region */
+  size_t chklim = 63;                     /* threshold of ordering element check */
+  stack_node stack[32], *top = stack;     /* 32 is enough for 32bit CPU */
   int mmkind;
   size_t high, low, n;
 
@@ -204,8 +205,8 @@ rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d,
 
   nxt:
   if (stack == top) {
-      /* stack is empty - run insertion sort over to finalize */
-      insertion_sort(base, (char*)base + size*(nel-1), cmp, d, mmarg);
+      /* stack is empty - run insertion sort over nearly-sorted array to finalize */
+      insertion_sort(base, end, cmp, d, mmarg);
       return;
   }
   POP(L,R);
