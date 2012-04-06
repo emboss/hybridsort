@@ -171,18 +171,26 @@ typedef struct { char *LL, *RR; } stack_node; /* Stack structure for L,l,R,r */
 typedef int (cmpfunc_t)(const void*, const void*, void*);
 
 static void
-insertion_sort(char *l, char *r, cmpfunc_t *cmp, void *d, mmargdecl)
+ruby_isort(char *l, char *r, cmpfunc_t *cmp, void *d, mmargdecl)
 {
-    char *p, *q, *v;
+    char *p, *q, *v, *tmp;
+    int first_cmp;
+    
     v = ALLOCA_N(char, size);
 
     for(p = l + size; p <= r; p += size) {
+	first_cmp = cmp(p - size, p, d);
+
+	if (first_cmp <= 0)
+	    continue;
+
 	mmassign(v, p);
-        for (q = p - size; q >= l && cmp(q, v, d) > 0; q -= size) {
+	tmp = p;
+	mmassign(p, p - size);
+        for (q = tmp - 2 * size; q >= l && cmp(q, v, d) > 0; q -= size) {
 	    mmassign(q+size, q);
         }
-	if (q+size != p)
-	    mmassign(q+size, v);
+	mmassign(q + size, v);
     }
 }
 
@@ -206,7 +214,7 @@ rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d,
   nxt:
   if (stack == top) {
       /* stack is empty - run insertion sort over nearly-sorted array to finalize */
-      insertion_sort(base, end, cmp, d, mmarg);
+      ruby_isort(base, end, cmp, d, mmarg);
       return;
   }
   POP(L,R);
@@ -220,10 +228,11 @@ rqsort(void* base, const size_t nel, const size_t size, cmpfunc_t *cmp, void *d,
 
     l = L; r = R;
     n = (r - l + size) / size;  /* number of elements */
-    m = l + size * (n >> 1);    /* calculate median value */
 
     if (n <= cutoff) /* Leave chunks smaller than 'cutoff' unsorted */
 	goto nxt;
+
+    m = l + size * (n >> 1);    /* calculate median value */
 
     if (n >= 60) {
       register char *m1;
